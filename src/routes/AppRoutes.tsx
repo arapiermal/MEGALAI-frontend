@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import MainLayout from '../layout/MainLayout';
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/DashboardPage';
 import TopicsPage from '../pages/TopicsPage';
@@ -13,28 +14,27 @@ import AdminPage from '../pages/AdminPage';
 import PlatformAdminPage from '../pages/PlatformAdminPage';
 import SettingsPage from '../pages/SettingsPage';
 import NotFoundPage from '../pages/NotFoundPage';
+import RequireAuth from './RequireAuth';
 
-interface Props {
-  layout: React.ReactNode;
-}
-
-const AppRoutes: React.FC<Props> = ({ layout }) => {
+const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route element={layout}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/topics" element={<TopicsPage />} />
-        <Route path="/lesson-generator" element={<LessonGeneratorPage />} />
-        <Route path="/quiz-generator" element={<QuizGeneratorPage />} />
-        <Route path="/worksheet" element={<WorksheetPage />} />
-        <Route path="/rubric" element={<RubricPage />} />
-        <Route path="/text-tools" element={<TextToolsPage />} />
-        <Route path="/progress" element={<ProgressPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/platform-admin" element={<PlatformAdminPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="*" element={<NotFoundPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<RequireAuth />}>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="topics" element={<TopicsPage />} />
+          <Route path="lesson-generator" element={<LessonGeneratorPage />} />
+          <Route path="quiz-generator" element={<QuizGeneratorPage />} />
+          <Route path="worksheet" element={<WorksheetPage />} />
+          <Route path="rubric" element={<RubricPage />} />
+          <Route path="text-tools" element={<TextToolsPage />} />
+          <Route path="progress" element={<ProgressPage />} />
+          <Route path="admin" element={<AdminPage />} />
+          <Route path="platform-admin" element={<PlatformAdminPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Route>
     </Routes>
   );
