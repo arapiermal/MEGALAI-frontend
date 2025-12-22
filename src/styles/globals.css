@@ -158,4 +158,26 @@
     font-size: 14px;
     color: #4b5563;
   }
+
+  .login-container {
+    max-width: 440px;
+    margin: 72px auto;
+    padding: 24px;
+  }
+
+  .login-banner {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .login-title {
+    margin: 0 0 6px;
+  }
+
+  .login-subtitle {
+    margin: 0 0 18px;
+    color: #4b5563;
+  }
 }
