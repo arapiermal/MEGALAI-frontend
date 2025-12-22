@@ -19,9 +19,14 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: '80px auto', padding: 24 }}>
-      <h1>{t('login.title')}</h1>
-      <p>{t('login.description')}</p>
+    <div className="login-container">
+      <img
+        className="login-banner"
+        src="https://www.erimali.com/assets/MEGALAI_banner.png"
+        alt="MEGALAI banner"
+      />
+      <h1 className="login-title">{t('login.title')}</h1>
+      <p className="login-subtitle">{t('login.description')}</p>
       <Input label={t('auth.email')} value={email} onChange={(e) => setEmail(e.target.value)} />
       <Select
         label={t('auth.role')}
