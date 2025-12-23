@@ -1,7 +1,9 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import LoginPage from '../pages/LoginPage';
+import RegisterPage from '../pages/RegisterPage';
+import VerifyEmailPage from '../pages/VerifyEmailPage';
 import DashboardPage from '../pages/DashboardPage';
 import TopicsPage from '../pages/TopicsPage';
 import LessonGeneratorPage from '../pages/LessonGeneratorPage';
@@ -19,7 +21,10 @@ import RequireAuth from './RequireAuth';
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<Navigate to="/auth/login" replace />} />
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
       <Route element={<RequireAuth />}>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<DashboardPage />} />

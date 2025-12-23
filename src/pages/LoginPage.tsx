@@ -1,21 +1,75 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Input from '../components/ui/Input';
-import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
-import { Role, useAuthStore } from '../store/useAuthStore';
+import { authApi } from '../lib/authApi';
+import { useAuthStore } from '../store/useAuthStore';
 import { useI18n } from '../i18n/i18n';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<Role>('student');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { t } = useI18n();
+  const successMessage = useMemo(() => {
+    if (searchParams.get('verified')) {
+      return 'Your email is verified. Please log in to continue.';
+    }
 
-  const handleLogin = () => {
-    login(email || 'demo@university.edu', role);
-    navigate('/');
+    return null;
+  }, [searchParams]);
+
+  const redirectPath =
+    (location.state as { from?: { pathname: string } } | null)?.from?.pathname || '/';
+
+  const validate = () => {
+    const nextErrors: { email?: string; password?: string } = {};
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+
+    if (!email.trim()) {
+      nextErrors.email = 'Email is required.';
+    } else if (!emailRegex.test(email)) {
+      nextErrors.email = 'Enter a valid email address.';
+    }
+
+    if (!password) {
+      nextErrors.password = 'Password is required.';
+    }
+
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormError(null);
+
+    if (!validate()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await authApi.login({ email, password });
+      login(response);
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to sign in. Please try again.';
+      setFormError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = () => {
+    setEmail('demo@megalai.app');
+    setPassword('DemoPass123!');
   };
 
   return (
@@ -27,21 +81,38 @@ const LoginPage: React.FC = () => {
       />
       <h1 className="login-title">{t('login.title')}</h1>
       <p className="login-subtitle">{t('login.description')}</p>
-      <Input label={t('auth.email')} value={email} onChange={(e) => setEmail(e.target.value)} />
-      <Select
-        label={t('auth.role')}
-        value={role}
-        onChange={(e) => setRole(e.target.value as Role)}
-        options={[
-          { value: 'student', label: t('role.student') },
-          { value: 'professor', label: t('role.professor') },
-          { value: 'orgAdmin', label: t('role.orgAdmin') },
-          { value: 'platformAdmin', label: t('role.platformAdmin') },
-        ]}
-      />
-      <Button onClick={handleLogin} style={{ width: '100%' }}>
-        {t('auth.login')}
-      </Button>
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
+      {formError && <div className="alert alert-error">{formError}</div>}
+      <div className="form-hint">
+        Demo access: <strong>demo@megalai.app</strong> / <strong>DemoPass123!</strong>
+      </div>
+      <form onSubmit={handleLogin}>
+        <Input
+          label={t('auth.email')}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          autoComplete="email"
+        />
+        {fieldErrors.email && <div className="form-error">{fieldErrors.email}</div>}
+        <Input
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          autoComplete="current-password"
+        />
+        {fieldErrors.password && <div className="form-error">{fieldErrors.password}</div>}
+        <Button type="submit" style={{ width: '100%' }} disabled={loading}>
+          {loading ? 'Signing in...' : t('auth.login')}
+        </Button>
+        <Button type="button" variant="secondary" style={{ width: '100%', marginTop: 8 }} onClick={handleDemoLogin}>
+          Use demo credentials
+        </Button>
+      </form>
+      <div className="form-footer">
+        <span>New here?</span> <Link to="/auth/register">Create an account</Link>
+      </div>
     </div>
   );
 };
