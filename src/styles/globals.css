@@ -125,6 +125,24 @@
     cursor: not-allowed;
   }
 
+  .form-error {
+    color: #dc2626;
+    font-size: 13px;
+    margin: -6px 0 10px;
+  }
+
+  .form-footer {
+    margin-top: 16px;
+    text-align: center;
+    color: #4b5563;
+  }
+
+  .form-footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
   .card {
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -148,6 +166,31 @@
     border-radius: 6px;
     border: 1px solid #ffeeba;
     color: #856404;
+  }
+
+  .alert-success {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+  }
+
+  .alert-error {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #991b1b;
+  }
+
+  .verification-guidance {
+    margin: 12px 0 16px;
+    font-size: 14px;
+    color: #4b5563;
+  }
+
+  .verification-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 12px;
   }
 
   .text-right {

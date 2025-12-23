@@ -3,11 +3,11 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 
 const RequireAuth: React.FC = () => {
-  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const location = useLocation();
 
-  if (!user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace state={{ from: location }} />;
   }
 
   return <Outlet />;
