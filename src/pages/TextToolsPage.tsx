@@ -4,12 +4,13 @@ import Select from '../components/ui/Select';
 import Button from '../components/ui/Button';
 import ResultPane from '../components/ai/ResultPane';
 import { runTextTool } from '../lib/aiClient';
+import type { TextToolResult } from '../lib/types';
 import { useI18n } from '../i18n/i18n';
 
 const TextToolsPage: React.FC = () => {
   const [mode, setMode] = useState('translate');
   const [text, setText] = useState('');
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<TextToolResult | null>(null);
   const { t } = useI18n();
 
   const handleRun = async () => {
@@ -35,7 +36,7 @@ const TextToolsPage: React.FC = () => {
         <Textarea label="Text" value={text} onChange={(e) => setText(e.target.value)} rows={4} />
         <Button onClick={handleRun}>{t('action.generate')}</Button>
       </div>
-      {result && <ResultPane title="Result" result={result} />}
+      {result && <ResultPane title="Result" result={result.output} />}
     </div>
   );
 };

@@ -1,15 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+import type { UserRead } from '../lib/types';
+
 export type Role = 'student' | 'professor' | 'orgAdmin' | 'platformAdmin';
 
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  role: Role;
-  currentOrganizationId?: string | null;
-}
+export type User = UserRead & { role: Role | string };
 
 interface AuthState {
   token: string | null;
@@ -34,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
       setOrganization: (orgId) =>
         set((state) => ({
-          user: state.user ? { ...state.user, currentOrganizationId: orgId } : null,
+          user: state.user ? { ...state.user, current_organization_id: orgId } : null,
         })),
     }),
     {

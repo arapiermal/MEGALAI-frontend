@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = 'https://api.megalai.erimali.com';
 
 export const providerModels: Record<string, string[]> = {
   default: ['megalai-default-edu-model'],

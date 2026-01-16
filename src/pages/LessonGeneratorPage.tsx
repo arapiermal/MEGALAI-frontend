@@ -4,7 +4,6 @@ import Textarea from '../components/ui/Textarea';
 import Button from '../components/ui/Button';
 import ProviderSelector from '../components/ai/ProviderSelector';
 import ModelSelector from '../components/ai/ModelSelector';
-import ResultPane from '../components/ai/ResultPane';
 import { generateLesson } from '../lib/aiClient';
 import { Lesson } from '../lib/types';
 import { useI18n } from '../i18n/i18n';
@@ -17,7 +16,11 @@ const LessonGeneratorPage: React.FC = () => {
   const { t } = useI18n();
 
   const handleGenerate = async () => {
-    const lesson = await generateLesson({ topic, grade, objectives });
+    const parsedObjectives = objectives
+      .split(/\n|,/)
+      .map((objective) => objective.trim())
+      .filter(Boolean);
+    const lesson = await generateLesson({ topic, grade, objectives: parsedObjectives });
     setResult(lesson);
   };
 
@@ -39,7 +42,32 @@ const LessonGeneratorPage: React.FC = () => {
         </div>
         <Button onClick={handleGenerate}>{t('action.generate')}</Button>
       </div>
-      {result && <ResultPane title="Lesson plan" result={result} />}
+      {result && (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>{result.title}</h3>
+          <p>{result.overview}</p>
+          <div>
+            <strong>Objectives</strong>
+            <ul>
+              {result.objectives.map((objective, index) => (
+                <li key={`${objective}-${index}`}>{objective}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <strong>Activities</strong>
+            <ul>
+              {result.activities.map((activity, index) => (
+                <li key={`${activity}-${index}`}>{activity}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <strong>Assessment</strong>
+            <p>{result.assessment}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
