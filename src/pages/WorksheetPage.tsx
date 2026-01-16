@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import ResultPane from '../components/ai/ResultPane';
 import { generateWorksheet } from '../lib/aiClient';
 import { Worksheet } from '../lib/types';
 import { useI18n } from '../i18n/i18n';
@@ -25,7 +24,16 @@ const WorksheetPage: React.FC = () => {
         <Input label="Grade" value={grade} onChange={(e) => setGrade(e.target.value)} />
         <Button onClick={handleGenerate}>{t('action.generate')}</Button>
       </div>
-      {result && <ResultPane title="Worksheet" result={result} />}
+      {result && (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>{result.topic}</h3>
+          <ul>
+            {result.activities.map((activity, index) => (
+              <li key={`${activity}-${index}`}>{activity}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

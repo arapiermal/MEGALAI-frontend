@@ -1,3 +1,6 @@
+import axios from 'axios';
+import { apiClient } from './apiClient';
+import type { Token, UserRead } from './types';
 import type { User } from '../store/useAuthStore';
 
 type LoginPayload = {
@@ -8,73 +11,74 @@ type LoginPayload = {
 type RegisterPayload = {
   email: string;
   password: string;
+  name?: string;
+  organization_id?: string | null;
 };
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const createUser = (email: string): User => ({
-  id: Math.random().toString(36).slice(2, 10),
-  email,
-  name: email.split('@')[0] || 'User',
-  role: 'student',
-  currentOrganizationId: null,
-});
-
-const throwAuthError = (message: string) => {
-  throw new Error(message);
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError(error)) {
+    const detail = error.response?.data?.detail;
+    if (Array.isArray(detail)) {
+      return detail.map((item) => item?.msg ?? item).join(', ');
+    }
+    if (typeof detail === 'string') {
+      return detail;
+    }
+  }
+  return error instanceof Error ? error.message : fallback;
 };
 
 export const authApi = {
   async login({ email, password }: LoginPayload): Promise<{ token: string; user: User }> {
-    await delay(700);
-
-    if (!email || !password) {
-      throwAuthError('Email and password are required.');
+    try {
+      const { data } = await apiClient.post<Token>('/auth/login', { email, password });
+      return { token: data.access_token, user: data.user };
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Unable to sign in. Please try again.'));
     }
-
-    if (email.includes('error') || password === 'password') {
-      throwAuthError('Invalid email or password.');
-    }
-
-    return {
-      token: `demo-token-${Math.random().toString(36).slice(2, 10)}`,
-      user: createUser(email),
-    };
   },
 
-  async register({ email, password }: RegisterPayload): Promise<{ ok: true; emailSent: true }> {
-    await delay(800);
-
-    if (!email || !password) {
-      throwAuthError('Email and password are required.');
+  async register({ email, password, name, organization_id }: RegisterPayload): Promise<UserRead> {
+    try {
+      const resolvedName = name || email.split('@')[0] || 'User';
+      const { data } = await apiClient.post<UserRead>('/auth/register', {
+        email,
+        password,
+        name: resolvedName,
+        organization_id,
+      });
+      return data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Unable to register. Please try again.'));
     }
+  },
 
-    if (email.includes('taken')) {
-      throwAuthError('This email is already registered.');
+  async getMe(): Promise<UserRead> {
+    try {
+      const { data } = await apiClient.get<UserRead>('/auth/me');
+      return data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Unable to fetch user profile.'));
     }
-
-    return { ok: true, emailSent: true };
   },
 
   async resendVerification(email: string): Promise<{ ok: true }> {
-    await delay(600);
-
-    if (!email) {
-      throwAuthError('Email is required to resend verification.');
+    try {
+      await apiClient.post('/auth/resend-verification', { email });
+      return { ok: true };
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Unable to resend verification email.'));
     }
-
-    return { ok: true };
   },
 
   async checkEmailVerified(email: string): Promise<{ verified: boolean }> {
-    await delay(600);
-
-    if (!email) {
-      throwAuthError('Email is required to check verification status.');
+    try {
+      const { data } = await apiClient.get<{ verified: boolean }>('/auth/check-email-verified', {
+        params: { email },
+      });
+      return data;
+    } catch (error) {
+      throw new Error(getErrorMessage(error, 'Unable to check verification status.'));
     }
-
-    const verified = email.includes('verified');
-
-    return { verified };
   },
 };

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
-import ResultPane from '../components/ai/ResultPane';
 import { generateQuiz } from '../lib/aiClient';
 import { Quiz } from '../lib/types';
 import { useI18n } from '../i18n/i18n';
@@ -13,7 +12,7 @@ const QuizGeneratorPage: React.FC = () => {
   const { t } = useI18n();
 
   const handleGenerate = async () => {
-    const quiz = await generateQuiz({ topic, numQuestions });
+    const quiz = await generateQuiz({ topic, num_questions: numQuestions });
     setResult(quiz);
   };
 
@@ -30,7 +29,31 @@ const QuizGeneratorPage: React.FC = () => {
         />
         <Button onClick={handleGenerate}>{t('action.generate')}</Button>
       </div>
-      {result && <ResultPane title="Quiz" result={result} />}
+      {result && (
+        <div className="card">
+          <h3 style={{ marginTop: 0 }}>{result.topic}</h3>
+          <div>
+            {result.questions.map((question, index) => (
+              <div key={`${question.question}-${index}`} style={{ marginBottom: '1rem' }}>
+                <strong>
+                  {index + 1}. {question.question}
+                </strong>
+                <ul>
+                  {question.options.map((option) => (
+                    <li key={option}>
+                      {option}
+                      {option === question.answer ? ' (Correct)' : ''}
+                    </li>
+                  ))}
+                </ul>
+                <div>
+                  <em>Answer: {question.answer}</em>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

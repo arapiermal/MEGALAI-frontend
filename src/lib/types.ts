@@ -1,14 +1,45 @@
-export interface Lesson {
+export interface UserRead {
+  email: string;
+  name: string;
+  role: string;
+  organization_id?: string | null;
+  current_organization_id?: string | null;
+  is_active: boolean;
+  id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Token {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  user: UserRead;
+}
+
+export interface LessonInput {
   topic: string;
-  gradeLevel: string;
+  grade: string;
   objectives: string[];
-  content: string;
+}
+
+export interface Lesson {
+  title: string;
+  overview: string;
+  objectives: string[];
+  activities: string[];
+  assessment: string;
 }
 
 export interface QuizQuestion {
   question: string;
   options: string[];
-  correctIndex: number;
+  answer: string;
+}
+
+export interface QuizInput {
+  topic: string;
+  num_questions: number;
 }
 
 export interface Quiz {
@@ -16,19 +47,39 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
+export interface WorksheetInput {
+  topic: string;
+  grade: string;
+}
+
 export interface Worksheet {
   topic: string;
-  sections: string[];
+  activities: string[];
 }
 
 export interface RubricCriterion {
-  name: string;
-  levels: { [level: string]: string };
+  criterion: string;
+  description: string;
+  points: number;
+}
+
+export interface RubricInput {
+  assignment_type: string;
+  description?: string;
 }
 
 export interface Rubric {
-  assignmentType: string;
+  assignment_type: string;
   criteria: RubricCriterion[];
+}
+
+export interface TextToolInput {
+  mode: string;
+  text: string;
+}
+
+export interface TextToolResult {
+  output: string;
 }
 
 export interface ProgressSummary {
