@@ -30,7 +30,7 @@ const LoginPage: React.FC = () => {
 
   const validate = () => {
     const nextErrors: { email?: string; password?: string } = {};
-    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email.trim()) {
       nextErrors.email = 'Email is required.';

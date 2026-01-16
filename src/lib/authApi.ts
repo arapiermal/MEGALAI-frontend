@@ -24,6 +24,12 @@ const getErrorMessage = (error: unknown, fallback: string) => {
     if (typeof detail === 'string') {
       return detail;
     }
+    if (detail && typeof detail === 'object' && 'msg' in detail) {
+      const message = (detail as { msg?: string }).msg;
+      if (message) {
+        return message;
+      }
+    }
   }
   return error instanceof Error ? error.message : fallback;
 };
